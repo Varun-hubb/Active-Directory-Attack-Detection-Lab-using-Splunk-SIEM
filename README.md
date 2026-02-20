@@ -11,7 +11,13 @@ Additionally, Atomic Red Team was used to simulate MITRE ATT&CK techniques such 
 This project demonstrates hands-on experience in Active Directory administration, SIEM log ingestion, attack simulation, and SOC-level security analysis.
 
 ## 🏗️ Lab Architecture
+### 🔹 Architecture Diagram
 
+(Add your architecture image below)
+
+```markdown
+![Lab Architecture](screenshots/architecture.png)
+```
 This lab environment was designed to simulate a small enterprise network with centralized log monitoring and attack detection capabilities.
 
 ### 🔹 Virtual Machines Used
@@ -47,9 +53,3 @@ This lab environment was designed to simulate a small enterprise network with ce
 
 ---
 
-### 🔹 Architecture Diagram
-
-(Add your architecture image below)
-
-```markdown
-![Lab Architecture](screenshots/architecture.png)
