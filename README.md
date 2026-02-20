@@ -193,7 +193,7 @@ Configuration steps included:
 ---
 
 ### 🔹 Log Sources Configured
-
+![inputs_conf](https://github.com/Varun-hubb/Active-Directory-Attack-Detection-Lab-using-Splunk-SIEM/blob/main/screenshots/inputs_conf.png)
 The following logs were ingested into Splunk:
 
 - Windows Security Event Logs
@@ -201,10 +201,205 @@ The following logs were ingested into Splunk:
 - Sysmon logs (process creation, PowerShell activity)
 - System and Application logs
 
+### 🔹 Log Verification
+![logs_verified](https://github.com/Varun-hubb/Active-Directory-Attack-Detection-Lab-using-Splunk-SIEM/blob/main/screenshots/logs_verification.png)
 ---
 
-### 🔹 Log Verification
+## 🔥 Attack Simulation – Brute Force (Hydra)
 
-To confirm successful ingestion, the following searches were performed:
+To simulate a real-world credential attack scenario, a brute-force attack was performed from the Kali Linux machine targeting domain user accounts in the `games.local` environment.
 
-Search for failed logons:
+---
+
+### 🔹 Objective
+
+The objective of this attack simulation was to:
+
+- Generate authentication failure logs.
+- Identify detection patterns for brute-force attempts.
+- Validate Splunk's ability to detect credential-based attacks.
+- Observe successful account compromise behavior.
+
+---
+
+### 🔹 Attack Execution
+
+- Used **Hydra** tool from Kali Linux.
+- Targeted domain user accounts.
+- Attempted password guessing against Windows authentication service.
+- After multiple failed attempts, valid credentials were successfully identified.
+
+This simulated a common credential access technique used by attackers.
+
+---
+
+### 🔹 Windows Security Events Generated
+# Brute Force attack performed for user Krshnam:
+![krshnam_bruteforce](https://github.com/Varun-hubb/Active-Directory-Attack-Detection-Lab-using-Splunk-SIEM/blob/main/screenshots/user_krshnam.png)
+
+# Brute Force attack performed for user Arjunam:
+![arjunam](https://github.com/Varun-hubb/Active-Directory-Attack-Detection-Lab-using-Splunk-SIEM/blob/main/screenshots/user_arjunam.png)
+The brute-force activity generated the following Windows Event IDs:
+
+- **Event ID 4625** → Failed logon attempt
+- **Event ID 4624** → Successful logon (after password discovery)
+
+Multiple 4625 events were observed before a successful 4624 authentication event.
+
+---
+
+### 🔹 Detection in Splunk
+
+In Splunk, the following searches were used:
+
+Failed logon attempts:
+index=endpoint EventCode=4625
+![endpoint_4625](https://github.com/Varun-hubb/Active-Directory-Attack-Detection-Lab-using-Splunk-SIEM/blob/main/screenshots/4625_krishnam.png)
+
+Successful logon:
+index=endpoint EventCode=4624
+![endpoint_4624](https://github.com/Varun-hubb/Active-Directory-Attack-Detection-Lab-using-Splunk-SIEM/blob/main/screenshots/4624_endpoint.png)
+Detection indicators included:
+
+- High volume of failed logons from a single source.
+- Repeated attempts against the same user account.
+- Successful logon following multiple failures.
+- Same source IP address associated with both events.
+
+---
+
+This confirmed that brute-force authentication activity was successfully captured, indexed, and detectable within the SIEM environment.
+## 🎯 MITRE ATT&CK Simulation – Atomic Red Team
+
+To simulate post-authentication adversary behavior, Atomic Red Team was deployed on the Windows 10 domain client. This allowed controlled execution of MITRE ATT&CK techniques to validate detection visibility in Splunk.
+
+---
+
+### 🔹 Objective
+
+The objective of this phase was to:
+
+- Simulate real-world adversary techniques.
+- Generate process execution and PowerShell logs.
+- Validate SIEM visibility beyond authentication events.
+- Map observed activity to MITRE ATT&CK framework.
+
+---
+
+### 🔹 Technique Execution
+
+Atomic Red Team was used to execute:
+
+- **T1059.001 – Command and Scripting Interpreter: PowerShell**
+- Additional supported techniques for process execution testing.
+
+These simulations generated:
+
+- PowerShell execution logs
+- Process creation events
+- Sysmon logs (if configured)
+- Windows Security Event ID 4688 (Process Creation)
+
+---
+
+### 🔹 Log Analysis in Splunk
+
+The following searches were performed to identify suspicious activity:
+
+Search for PowerShell execution:
+![powershell_logs](https://github.com/Varun-hubb/Active-Directory-Attack-Detection-Lab-using-Splunk-SIEM/blob/main/screenshots/powershell_logs.png)
+
+| Technique | ID | Description |
+|-----------|----|-------------|
+| Command & Scripting Interpreter: PowerShell | T1059.001 | Execution |
+| Brute Force | T1110 | Credential Access |
+
+---
+
+This phase demonstrated the ability to simulate adversary behavior and analyze detection artifacts using a structured threat framework.
+
+## 🔐 Security Analysis
+
+This lab successfully demonstrated detection of credential-based attacks and adversary execution techniques within a simulated enterprise Active Directory environment.
+
+---
+
+### 🔹 Credential Access Analysis
+
+The brute-force simulation generated a clear authentication abuse pattern:
+
+- High volume of Event ID 4625 (failed logons)
+- Repeated attempts targeting the same account
+- Followed by Event ID 4624 (successful logon)
+
+This sequence strongly indicates credential guessing activity and potential account compromise.
+
+Such patterns are commonly associated with:
+- Password spraying
+- Brute-force attacks
+- Unauthorized access attempts
+
+Early detection of these indicators is critical to preventing lateral movement and privilege escalation.
+
+---
+
+### 🔹 Post-Authentication Execution Analysis
+
+Execution of MITRE ATT&CK techniques (T1059.001 – PowerShell) generated:
+
+- Event ID 4688 (process creation)
+- PowerShell execution artifacts
+- Command-line logging evidence
+
+Monitoring process creation events enables detection of:
+
+- Malicious script execution
+- Living-off-the-land techniques
+- Suspicious parent-child process chains
+- Post-compromise activity
+
+This demonstrates visibility beyond authentication and into attacker behavior after gaining access.
+
+---
+
+### 🔹 Detection Effectiveness
+
+The lab validates:
+
+- Successful log ingestion into Splunk
+- Real-time authentication monitoring
+- Ability to correlate failed and successful logins
+- Detection of suspicious command execution
+- Mapping of activity to MITRE ATT&CK framework
+
+The centralized SIEM deployment provided complete visibility across:
+
+- Domain Controller
+- Domain Client
+- Attack source behavior
+
+---
+
+### 🔹 SOC Relevance
+
+This project reflects real SOC responsibilities:
+
+- Log monitoring
+- Event triage
+- Pattern recognition
+- Attack detection
+- Threat behavior mapping
+- Investigation using SIEM queries
+
+It demonstrates hands-on experience in identifying authentication abuse and adversary techniques within a domain environment.
+
+## ✅ Conclusion
+
+This project successfully simulated a real-world enterprise Active Directory environment and validated detection capabilities using Splunk SIEM.
+
+Through controlled brute-force attacks and MITRE ATT&CK technique simulations, authentication abuse and post-compromise execution activity were successfully generated, ingested, and analyzed. Key Windows Security Event IDs (4625, 4624, 4688) were investigated to identify attack patterns and validate detection workflows.
+
+The lab demonstrates practical experience in Active Directory administration, SIEM deployment, log analysis, adversary simulation, and SOC-level investigation. It reflects hands-on capability in identifying credential-based attacks and analyzing suspicious process activity within a centralized monitoring environment.
+
+This project strengthens foundational skills required for a SOC Analyst role, including alert triage, event correlation, and threat behavior analysis.
+
